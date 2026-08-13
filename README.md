@@ -76,13 +76,20 @@ graph TD
 
 On some cellular carriers (especially on 5G networks), iOS shares the hotspot over an **IPv6-only / NAT64** translation layer. In this mode, the iPad/iPhone is assigned a translated internal IPv4 address like **`192.0.0.2`**, while the laptop is assigned a standard local address like **`172.20.10.7`**. This IP mismatch prevents local IPv4 routing, making standard IP URLs inaccessible.
 
-If you encounter this, connect using the local hostname:
+If you encounter this, connect using one of the options below:
 
-### Use the Local Hostname Link
+### Option A: Use the Local Hostname Link (Easiest)
 vikuAir supports dual-stack IPv4/IPv6 and local **mDNS (Bonjour)** hostnames. You don't need IP addresses at all:
 1. When you run `start.bat`, look at the console log output for the **Local Hostname Link**:
    `http://<your-computer-name>.local:3000/?token=XXXXXX`
 2. Open this `.local` link directly in Safari on your iPad/iPhone (or scan the QR Code). iOS will resolve the laptop name natively over local IPv6 routing.
+
+### Option B: Use the Direct IPv6 Address URL
+If you prefer to connect using the raw IPv6 address of your laptop instead of the `.local` name:
+1. Note the IPv6 addresses shown in the PC console when the server launches.
+2. In your iPad/iPhone browser, you **must wrap the IPv6 address in square brackets `[...]`** so the browser can differentiate the IPv6 colons from the port colon:
+   `http://[YOUR_IPV6_ADDRESS]:3000/?token=XXXXXX`
+   *(Example: `http://[2409:40e3:48:b6f2:453f:dcd:8238:c856]:3000/?token=CDFM1C`)*
 
 ---
 
