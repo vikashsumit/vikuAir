@@ -22,7 +22,7 @@ python -c "import sys" >nul 2>nul
 if %errorlevel% neq 0 (
     echo ❌ Error: Python is not installed or not added to your system PATH!
     echo.
-    echo Please download and install Python (version 3.8 or newer) on this PC first.
+    echo Please download and install Python version 3.8 or newer on this PC first.
     echo Make sure to check the box: "Add python.exe to PATH" during installation.
     echo.
     echo Download link: https://www.python.org/downloads/
@@ -33,10 +33,10 @@ if %errorlevel% neq 0 (
 
 :: Check if virtual environment folder exists. If not, set it up automatically
 if not exist ".venv" (
-    echo ⚙️ Virtual environment (.venv) not found.
+    echo ⚙️ Virtual environment folder not found.
     echo 🛠️ Setting up vikuAir on this PC for the first time...
     echo.
-    echo Creating virtual environment (.venv)...
+    echo Creating virtual environment folder...
     python -m venv .venv
     if %errorlevel% neq 0 (
         echo ❌ Error: Failed to create virtual environment!
