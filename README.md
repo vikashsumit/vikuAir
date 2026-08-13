@@ -78,7 +78,7 @@ On some cellular carriers (especially on 5G networks), iOS shares the hotspot ov
 
 If you encounter this, connect using the local hostname:
 
-### Use the Local Hostname Link (Easiest)
+### Use the Local Hostname Link
 vikuAir supports dual-stack IPv4/IPv6 and local **mDNS (Bonjour)** hostnames. You don't need IP addresses at all:
 1. When you run `start.bat`, look at the console log output for the **Local Hostname Link**:
    `http://<your-computer-name>.local:3000/?token=XXXXXX`
