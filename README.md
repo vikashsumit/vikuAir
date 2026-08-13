@@ -91,6 +91,13 @@ If you prefer to connect using the raw IPv6 address of your laptop instead of th
    `http://[YOUR_IPV6_ADDRESS]:3000/?token=XXXXXX`
    *(Example: `http://[2409:40e3:48:b6f2:453f:dcd:8238:c856]:3000/?token=CDFM1C`)*
 
+### Option C: Use Windows Mobile Hotspot
+If the iPhone Hotspot routing remains isolated or fails, you can share the connection in reverse:
+1. On your **Windows PC**, open settings and turn on **Mobile Hotspot**.
+2. Connect your iPad/iPhone to the **Windows PC's Wi-Fi Hotspot network**.
+3. Launch `start.bat`. Under network access options, look for the link labeled with **`Local Area Connection`** or **`192.168.137.x`** (typically `http://192.168.137.1:3000/?token=XXXXXX`).
+4. Open that URL on your iPad. Because Windows controls the local DHCP and routing directly, this local connection bypasses all cellular carrier translations and is guaranteed to connect.
+
 ---
 
 ## 📂 Project Structure
