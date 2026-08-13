@@ -72,6 +72,37 @@ graph TD
 
 ---
 
+## 📶 Troubleshooting Hotspot Connection Issues
+
+On some cellular carriers (especially on 5G networks), iOS shares the hotspot over an **IPv6-only / NAT64** translation layer. In this mode, the iPad/iPhone is assigned a translated internal IPv4 address like **`192.0.0.2`**, while the laptop is assigned a standard local address like **`172.20.10.7`**. This IP mismatch prevents local IPv4 routing, making standard IP URLs inaccessible.
+
+If you encounter this, use one of the three solutions below:
+
+### Option A: Use the Local Hostname Link (Easiest)
+vikuAir supports dual-stack IPv4/IPv6 and local **mDNS (Bonjour)** hostnames. You don't need IP addresses at all:
+1. When you run `start.bat`, look at the console log output for the **Local Hostname Link**:
+   `http://<your-computer-name>.local:3000/?token=XXXXXX`
+2. Open this `.local` link directly in Safari on your iPad/iPhone (or scan the QR Code). iOS will resolve the laptop name natively over local IPv6 routing.
+
+### Option B: Configure a Static IP on the iPad
+You can manually force the iPad to join the laptop's `172.20.10.x` local IPv4 range:
+1. On your iPad, go to **Settings** > **Wi-Fi**.
+2. Tap the **"i" (info)** icon next to your connected iPhone Hotspot.
+3. Tap **Configure IP** > select **Manual**.
+4. Set:
+   *   **IP Address:** `172.20.10.3` *(or any value between `2` and `15` except the laptop's IP)*
+   *   **Subnet Mask:** `255.255.255.0`
+   *   **Router:** `172.20.10.1`
+5. Tap **Save** in the top right.
+
+### Option C: Switch iPhone Data to LTE
+If your iPhone is connected to 5G, forcing it to fall back to LTE disables the carrier's IPv6-only translation layer and triggers standard IPv4 allocations:
+1. On your **iPhone**, go to **Settings** > **Cellular** > **Cellular Data Options**.
+2. Tap **Voice & Data** and select **LTE** *(instead of 5G)*.
+3. Reconnect both devices to the hotspot.
+
+---
+
 ## 📂 Project Structure
 
 ```text
