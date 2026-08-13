@@ -53,13 +53,17 @@ async def lifespan(app_instance: FastAPI):
     print(f"Local Access (No PIN required):")
     print(f"  🔗 http://localhost:{PORT}")
     
+    hostname = socket.gethostname().lower()
+    print(f"\nLocal Hostname Link (Easiest for iPad/iPhone):")
+    print(f"  🔗 http://{hostname}.local:{PORT}/?token={ACCESS_TOKEN}")
+    
     ips = get_local_ips()
     if ips:
-        print(f"Network Access (Scan QR or type in mobile browser):")
+        print(f"\nNetwork Access (Scan QR or type in mobile browser):")
         for ip in ips:
             print(f"  🔗 http://{ip['address']}:{PORT}/?token={ACCESS_TOKEN}  ({ip['interface']})")
     else:
-        print(f"⚠️ No active local network connection detected.")
+        print(f"\n⚠️ No active local network connection detected.")
     print(f"======================================================\n")
     yield
 
@@ -390,4 +394,4 @@ if os.path.exists(dist_dir):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="0.0.0.0", port=PORT, log_level="warning")
+    uvicorn.run("server:app", host="::", port=PORT, log_level="warning")
