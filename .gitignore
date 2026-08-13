@@ -1,0 +1,21 @@
+# Python virtual environment
+.venv/
+__pycache__/
+*.pyc
+
+# Node dependencies
+node_modules/
+
+# Compiled bundle
+# Note: we check in dist/ so the python server works out of the box for other PCs
+# dist/
+
+# Shared user files (keep directory, ignore contents)
+shared_files/*
+!shared_files/.gitkeep
+
+# Local developer/system files
+.DS_Store
+Thumbs.db
+.gemini/
+*.log
