@@ -119,6 +119,9 @@ export default function App() {
   const isAuthorizedRef = useRef(isAuthorized);
   isAuthorizedRef.current = isAuthorized;
 
+  const clipboardRef = useRef(clipboard);
+  clipboardRef.current = clipboard;
+
   // Show visual alerts
   const showToast = (message, type = 'info') => {
     const id = Date.now();
@@ -265,9 +268,11 @@ export default function App() {
             break;
             
           case 'clipboard_update':
-            isSelfClipboardUpdate.current = true;
-            setClipboard(data.text);
-            showToast('Clipboard updated from another device', 'info');
+            if (data.text !== clipboardRef.current) {
+              isSelfClipboardUpdate.current = true;
+              setClipboard(data.text);
+              showToast('Clipboard updated from another device', 'info');
+            }
             break;
 
           case 'devices_updated':
