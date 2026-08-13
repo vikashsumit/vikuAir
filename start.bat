@@ -34,10 +34,8 @@ if %errorlevel% neq 0 (
 :: Check if the virtual environment is set up and has dependencies installed
 set SETUP_REQUIRED=0
 if not exist ".venv" set SETUP_REQUIRED=1
-if exist ".venv" (
-    .venv\Scripts\python.exe -c "import fastapi, psutil, qrcode, websockets" >nul 2>nul
-    if %errorlevel% neq 0 set SETUP_REQUIRED=1
-)
+if exist ".venv" .venv\Scripts\python.exe -c "import fastapi, psutil, qrcode, websockets" >nul 2>nul
+if %errorlevel% neq 0 set SETUP_REQUIRED=1
 
 if "%SETUP_REQUIRED%"=="1" (
     echo ⚙️ Virtual environment not fully configured.
