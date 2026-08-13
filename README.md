@@ -30,19 +30,19 @@ The project features a high-performance **Python FastAPI & WebSockets** backend 
 
 ```mermaid
 graph TD
-    subgraph Windows PC [Windows PC Server & Client]
-        S[FastAPI Python Server]
-        WSS[WebSocket Server]
-        DB[shared_files/ directory]
-        WebWin[Windows Chrome/Edge UI]
+    subgraph WindowsPC ["Windows PC Server & Client"]
+        S["FastAPI Python Server"]
+        WSS["WebSocket Server"]
+        DB["shared_files/ directory"]
+        WebWin["Windows Chrome/Edge UI"]
     end
 
-    subgraph iOS [iPhone / iPad Client]
-        WebiOS[iOS Safari UI]
+    subgraph iOS ["iPhone / iPad Client"]
+        WebiOS["iOS Safari UI"]
     end
 
-    WebWin <-->|HTTP API / WebSockets| S
-    WebiOS <-->|HTTP API (Token Header) / WebSockets (Query Token)| S
+    WebWin <-->|"HTTP API / WebSockets"| S
+    WebiOS <-->|"HTTP API (Token Header) / WebSockets (Query Token)"| S
     S <--> DB
     S <--> WSS
 ```
