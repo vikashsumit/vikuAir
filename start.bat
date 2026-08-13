@@ -52,7 +52,7 @@ if "%SETUP_REQUIRED%"=="1" (
     )
     echo.
     echo Installing dependencies from requirements.txt...
-    .venv\Scripts\pip.exe install -r requirements.txt
+    .venv\Scripts\python.exe -m pip install -r requirements.txt
     if %errorlevel% neq 0 (
         echo ❌ Error: Failed to install packages!
         pause
