@@ -174,9 +174,29 @@ body {
   align-items: start;
 }
 
+/* Responsive Visibility Helper Utilities */
+.mobile-only {
+  display: none !important;
+}
+
+.tab-navigation-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
 @media (max-width: 900px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
+  }
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only {
+    display: block !important;
+  }
+  .tab-navigation-container.mobile-only {
+    display: flex !important;
   }
 }
 
