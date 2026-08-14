@@ -702,7 +702,7 @@ export default function App() {
                 wsRef.current.close();
               }
             }}
-            className="action-btn"
+            className="logout-btn-header"
             title="Log Out"
             style={{
               display: 'flex',
