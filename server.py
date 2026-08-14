@@ -262,11 +262,8 @@ async def update_token(request: Request):
     ACCESS_TOKEN = new_token
     print(f"\n🔒 ACCESS PIN updated to: {ACCESS_TOKEN}\n")
 
-    # Disconnect and revoke access for all network clients
-    evict_ws = []
-    for ws, meta in connected_devices.items():
-        if not meta["isSelf"]:
-            evict_ws.append(ws)
+    # Disconnect and revoke access for all clients (including host PC browser)
+    evict_ws = list(connected_devices.keys())
 
     for ws in evict_ws:
         try:
