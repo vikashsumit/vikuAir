@@ -99,7 +99,7 @@ export default function App() {
     return host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
   });
   const [pinInput, setPinInput] = useState('');
-  const [canManageToken, setCanManageToken] = useState(false);
+  const [canManageToken, setCanManageToken] = useState(() => window.location.pathname === '/host');
   const [isEditingToken, setIsEditingToken] = useState(false);
   const [newTokenInput, setNewTokenInput] = useState('');
 

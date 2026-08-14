@@ -9,7 +9,7 @@ import psutil
 import qrcode
 from typing import List, Dict
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, HTTPException, Form, UploadFile, File
-from fastapi.responses import JSONResponse, FileResponse, HTMLResponse
+from fastapi.responses import JSONResponse, FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -392,6 +392,21 @@ dist_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dist")
 @app.get("/")
 @app.get("/index.html")
 async def serve_index(request: Request):
+    client_ip = request.client.host
+    if is_server_self(client_ip):
+        return RedirectResponse(url="/host")
+    
+    index_path = os.path.join(dist_dir, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
+    return HTMLResponse(content="vikuAir static bundle not found. Run 'npm run build' first.", status_code=404)
+
+@app.get("/host")
+async def serve_host(request: Request):
+    client_ip = request.client.host
+    if not is_server_self(client_ip):
+        return RedirectResponse(url="/")
+        
     index_path = os.path.join(dist_dir, "index.html")
     if os.path.exists(index_path):
         return FileResponse(index_path, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
