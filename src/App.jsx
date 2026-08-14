@@ -329,14 +329,12 @@ export default function App() {
 
     ws.onclose = (event) => {
       setIsWsConnected(false);
-      // Only show disconnected alert if it was a normal network close, not auth failure
+      // Auto logout on server close or connection loss
       if (isAuthorizedRef.current) {
-        showToast('Disconnected from server. Reconnecting...', 'warning');
-        setTimeout(() => {
-          if (isAuthorizedRef.current) {
-            window.location.reload();
-          }
-        }, 5000);
+        localStorage.removeItem('airflow_token');
+        setToken('');
+        setIsAuthorized(false);
+        showToast('Server closed or connection lost. Logged out.', 'error');
       }
     };
 
