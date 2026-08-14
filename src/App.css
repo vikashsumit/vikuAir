@@ -138,6 +138,7 @@ body {
   border-radius: 50px;
   font-size: 0.85rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .status-dot {

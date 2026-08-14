@@ -717,7 +717,8 @@ export default function App() {
               fontWeight: 600,
               gap: '0.35rem',
               cursor: 'pointer',
-              transition: 'all 0.2s'
+              transition: 'all 0.2s',
+              whiteSpace: 'nowrap'
             }}
             id="logout-btn"
           >
