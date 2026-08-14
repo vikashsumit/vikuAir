@@ -408,4 +408,20 @@ if os.path.exists(dist_dir):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="::", port=PORT, log_level="warning")
+    import socket
+    import asyncio
+    
+    try:
+        # Create a dual-stack socket manually (accepts both IPv4 and IPv6 on port PORT)
+        sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+        sock.bind(("::", PORT))
+        sock.listen()
+        
+        config = uvicorn.Config(app, host="::", port=PORT, log_level="warning")
+        server = uvicorn.Server(config)
+        asyncio.run(server.serve(sockets=[sock]))
+    except Exception as e:
+        print(f"⚠️ Dual-stack socket failed: {e}. Falling back to standard IPv4 bind.")
+        uvicorn.run("server:app", host="0.0.0.0", port=PORT, log_level="warning")
