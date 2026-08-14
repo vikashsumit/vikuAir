@@ -18,6 +18,8 @@ PORT = 3000
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "shared_files")
 # Generate a random 10-character access token for this session
 ACCESS_TOKEN = "".join(random.choices(string.ascii_uppercase + string.digits, k=10))
+# Generate a random 32-character host key to uniquely identify the server creator browser session
+HOST_KEY = "".join(random.choices(string.ascii_uppercase + string.digits, k=32))
 
 # Store clipboard content in-memory
 clipboard_text = ""
@@ -68,7 +70,7 @@ async def lifespan(app_instance: FastAPI):
     print(f"🔒 ACCESS PIN: {ACCESS_TOKEN}")
     print(f"------------------------------------------------------")
     print(f"Local Access (No PIN required):")
-    print(f"  🔗 http://localhost:{PORT}")
+    print(f"  🔗 http://localhost:{PORT}/host?key={HOST_KEY}")
     
     ips = get_local_ips()
     if ips:
@@ -91,22 +93,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Determine if the client requesting is the host PC itself (loopback or self-IP)
-def is_server_self(remote_ip: str) -> bool:
-    if remote_ip in ["127.0.0.1", "::1", "localhost", "::ffff:127.0.0.1"]:
-        return True
-    
-    local_ips = [ip["address"].strip("[]") for ip in get_local_ips()]
-    clean_ip = remote_ip
-    if remote_ip.startswith("::ffff:"):
-        clean_ip = remote_ip[7:]
-    
-    return clean_ip in local_ips
-
 # Security helper to authenticate API requests
 async def authenticate(request: Request):
-    client_ip = request.client.host
-    if is_server_self(client_ip):
+    # Check if the connection has the host cookie
+    host_cookie = request.cookies.get("host_key")
+    if host_cookie == HOST_KEY:
         return
 
     token = request.headers.get("x-access-token") or request.query_params.get("token")
@@ -154,11 +145,12 @@ async def websocket_endpoint(websocket: WebSocket):
     token = websocket.query_params.get("token")
     await websocket.accept()
     
-    remote_address = websocket.client.host
-    is_self = is_server_self(remote_address)
+    # Check if the connection has the host cookie
+    host_cookie = websocket.cookies.get("host_key")
+    is_host = (host_cookie == HOST_KEY)
 
     # Verify connection token if not local host
-    if not is_self and token != ACCESS_TOKEN:
+    if not is_host and token != ACCESS_TOKEN:
         try:
             await websocket.send_text(json.dumps({"type": "auth_failed", "error": "Invalid security token"}))
             await websocket.close()
@@ -172,7 +164,7 @@ async def websocket_endpoint(websocket: WebSocket):
         "name": "Unknown Device",
         "type": "other",
         "connectedAt": "",
-        "isSelf": is_self
+        "isSelf": is_host
     }
 
     # Send initial clipboard state
@@ -239,18 +231,21 @@ async def websocket_endpoint(websocket: WebSocket):
 # Get local IPs
 @app.get("/api/ips")
 async def get_ips(request: Request):
-    await authenticate(request)
-    client_ip = request.client.host
+    host_cookie = request.cookies.get("host_key")
+    is_host = (host_cookie == HOST_KEY)
+    if not is_host:
+        await authenticate(request)
+        
     return {
         "ips": get_local_ips(),
-        "token": ACCESS_TOKEN if is_server_self(client_ip) else None
+        "token": ACCESS_TOKEN if is_host else None
     }
 
-# Update Access PIN (Restricted strictly to the host PC)
+# Update Access PIN (Restricted strictly to the host PC via host key cookie)
 @app.post("/api/token/update")
 async def update_token(request: Request):
-    client_ip = request.client.host
-    if not is_server_self(client_ip):
+    host_cookie = request.cookies.get("host_key")
+    if host_cookie != HOST_KEY:
         raise HTTPException(status_code=403, detail="Forbidden. Only the host PC can change the access PIN.")
 
     data = await request.json()
@@ -392,8 +387,8 @@ dist_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dist")
 @app.get("/")
 @app.get("/index.html")
 async def serve_index(request: Request):
-    client_ip = request.client.host
-    if is_server_self(client_ip):
+    host_cookie = request.cookies.get("host_key")
+    if host_cookie == HOST_KEY:
         return RedirectResponse(url="/host")
     
     index_path = os.path.join(dist_dir, "index.html")
@@ -403,14 +398,17 @@ async def serve_index(request: Request):
 
 @app.get("/host")
 async def serve_host(request: Request):
-    client_ip = request.client.host
-    if not is_server_self(client_ip):
-        return RedirectResponse(url="/")
-        
-    index_path = os.path.join(dist_dir, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
-    return HTMLResponse(content="vikuAir static bundle not found. Run 'npm run build' first.", status_code=404)
+    key = request.query_params.get("key")
+    host_cookie = request.cookies.get("host_key")
+    
+    if key == HOST_KEY or host_cookie == HOST_KEY:
+        index_path = os.path.join(dist_dir, "index.html")
+        if os.path.exists(index_path):
+            response = FileResponse(index_path, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
+            response.set_cookie(key="host_key", value=HOST_KEY, max_age=31536000, httponly=True)
+            return response
+            
+    return RedirectResponse(url="/")
 
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: Exception):
