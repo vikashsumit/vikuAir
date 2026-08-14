@@ -19,3 +19,4 @@ shared_files/*
 Thumbs.db
 .gemini/
 *.log
+.viku_token
