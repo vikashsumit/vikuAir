@@ -21,7 +21,8 @@ import {
   Tv,
   HelpCircle,
   Clock,
-  Lock
+  Lock,
+  LogOut
 } from 'lucide-react';
 
 // Determine device name & type using UserAgent
@@ -91,7 +92,12 @@ export default function App() {
   
   // Security state
   const [token, setToken] = useState(() => localStorage.getItem('airflow_token') || '');
-  const [isAuthorized, setIsAuthorized] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(() => {
+    const savedToken = localStorage.getItem('airflow_token');
+    if (savedToken) return true;
+    const host = window.location.hostname;
+    return host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
+  });
   const [pinInput, setPinInput] = useState('');
   const [canManageToken, setCanManageToken] = useState(false);
   const [isEditingToken, setIsEditingToken] = useState(false);
@@ -684,11 +690,41 @@ export default function App() {
             <div className="brand-subtitle">Local Network Sharing</div>
           </div>
         </div>
-        <div className="header-status">
+        <div className="header-status" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div className="connection-badge">
             <span className={`status-dot ${isWsConnected ? 'connected' : ''}`}></span>
             {isWsConnected ? 'Sync Active' : 'Disconnected'}
           </div>
+          <button
+            onClick={() => {
+              localStorage.removeItem('airflow_token');
+              setToken('');
+              setIsAuthorized(false);
+              if (wsRef.current) {
+                wsRef.current.close();
+              }
+            }}
+            className="action-btn"
+            title="Log Out"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'hsla(350, 60%, 45%, 0.15)',
+              border: '1px solid hsla(350, 60%, 45%, 0.3)',
+              color: '#f87171',
+              padding: '0.4rem 0.75rem',
+              borderRadius: '50px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              gap: '0.35rem',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            id="logout-btn"
+          >
+            <LogOut size={12} /> Log Out
+          </button>
         </div>
       </header>
 
