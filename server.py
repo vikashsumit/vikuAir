@@ -16,8 +16,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 PORT = 3000
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "shared_files")
-# Generate a random 6-character access token for this session
-ACCESS_TOKEN = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
+# Generate a random 10-character access token for this session
+ACCESS_TOKEN = "".join(random.choices(string.ascii_uppercase + string.digits, k=10))
 
 # Store clipboard content in-memory
 clipboard_text = ""
