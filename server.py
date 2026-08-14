@@ -16,36 +16,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 PORT = 3000
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "shared_files")
-TOKEN_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".viku_token")
-
-# Load or generate access token to persist across server restarts
-def load_or_create_token():
-    if os.path.exists(TOKEN_FILE):
-        try:
-            with open(TOKEN_FILE, "r") as f:
-                token = f.read().strip().upper()
-                if len(token) >= 3:
-                    return token
-        except Exception as e:
-            print(f"Error reading persisted token: {e}")
-    
-    # Generate a fresh random 6-character access token for new server creations
-    new_token = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
-    try:
-        with open(TOKEN_FILE, "w") as f:
-            f.write(new_token)
-    except Exception as e:
-        print(f"Error saving generated token: {e}")
-    return new_token
-
-def save_token(token_str: str):
-    try:
-        with open(TOKEN_FILE, "w") as f:
-            f.write(token_str.strip().upper())
-    except Exception as e:
-        print(f"Error saving token: {e}")
-
-ACCESS_TOKEN = load_or_create_token()
+# Generate a random 6-character access token for this session
+ACCESS_TOKEN = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
 # Store clipboard content in-memory
 clipboard_text = ""
@@ -288,7 +260,6 @@ async def update_token(request: Request):
 
     global ACCESS_TOKEN
     ACCESS_TOKEN = new_token
-    save_token(ACCESS_TOKEN)
     print(f"\n🔒 ACCESS PIN updated to: {ACCESS_TOKEN}\n")
 
     # Disconnect and revoke access for all network clients
