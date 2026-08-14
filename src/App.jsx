@@ -327,14 +327,37 @@ export default function App() {
       }
     };
 
-    ws.onclose = (event) => {
+    ws.onclose = async (event) => {
       setIsWsConnected(false);
-      // Auto logout on server close or connection loss
-      if (isAuthorizedRef.current) {
+      if (!isAuthorizedRef.current) return;
+
+      // Perform a health check to differentiate network drops from server shutdown
+      try {
+        const res = await fetch('/api/ips', {
+          headers: { 'X-Access-Token': token }
+        });
+        
+        if (res.status === 401) {
+          // Token is invalid/passcode was changed -> Force logout
+          localStorage.removeItem('airflow_token');
+          setToken('');
+          setIsAuthorized(false);
+          showToast('Passcode changed. Logged out.', 'warning');
+        } else {
+          // Server is still alive -> Transient network drop, try to reconnect
+          showToast('Connection lost. Reconnecting...', 'warning');
+          setTimeout(() => {
+            if (isAuthorizedRef.current) {
+              window.location.reload();
+            }
+          }, 3000);
+        }
+      } catch (err) {
+        // Fetch failed -> Server is offline/closed -> Force logout
         localStorage.removeItem('airflow_token');
         setToken('');
         setIsAuthorized(false);
-        showToast('Server closed or connection lost. Logged out.', 'error');
+        showToast('Server closed. Logged out.', 'error');
       }
     };
 
