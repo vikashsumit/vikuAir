@@ -389,11 +389,19 @@ async def post_clipboard(request: Request):
 # Serve frontend React SPA routing fallback
 dist_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dist")
 
+@app.get("/")
+@app.get("/index.html")
+async def serve_index(request: Request):
+    index_path = os.path.join(dist_dir, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
+    return HTMLResponse(content="vikuAir static bundle not found. Run 'npm run build' first.", status_code=404)
+
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: Exception):
     index_path = os.path.join(dist_dir, "index.html")
     if os.path.exists(index_path):
-        return FileResponse(index_path)
+        return FileResponse(index_path, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
     return HTMLResponse(content="vikuAir static bundle not found. Run 'npm run build' first.", status_code=404)
 
 if os.path.exists(dist_dir):
