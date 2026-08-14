@@ -547,6 +547,7 @@ body {
 }
 
 .file-name-label {
+  display: block;
   font-weight: 600;
   font-size: 0.95rem;
   white-space: nowrap;
