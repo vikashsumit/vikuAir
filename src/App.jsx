@@ -931,64 +931,64 @@ export default function App() {
         {/* Right/Sidebar Column - Connection, Clipboard & Active Hub */}
         <section className="sidebar-column">
           
-          {/* Quick Connect Helper */}
-          <div className={`glass-panel ${activeTab !== 'devices' ? 'desktop-only' : ''}`}>
-            <h2 style={{ fontFamily: 'var(--font-header)', fontWeight: 700, fontSize: '1.05rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Wifi size={18} style={{ color: 'var(--secondary)' }} /> Connect Devices
-            </h2>
-            <div className="qr-container">
-              {qrCodeUrl ? (
-                <div className="qr-box-wrapper">
-                  <img src={qrCodeUrl} alt="Network Scan QR Link" className="qr-image" />
-                </div>
-              ) : (
-                <div style={{ width: '180px', height: '180px', background: 'hsla(220, 10%, 15%, 0.4)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <RefreshCw className="animate-spin" size={24} />
-                </div>
-              )}
-              
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Scan QR with iPhone/iPad camera or enter local address in mobile browser:
-              </p>
+          {/* Quick Connect Helper - ONLY shown on host server */}
+          {canManageToken && (
+            <div className={`glass-panel ${activeTab !== 'devices' ? 'desktop-only' : ''}`}>
+              <h2 style={{ fontFamily: 'var(--font-header)', fontWeight: 700, fontSize: '1.05rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Wifi size={18} style={{ color: 'var(--secondary)' }} /> Connect Devices
+              </h2>
+              <div className="qr-container">
+                {qrCodeUrl ? (
+                  <div className="qr-box-wrapper">
+                    <img src={qrCodeUrl} alt="Network Scan QR Link" className="qr-image" />
+                  </div>
+                ) : (
+                  <div style={{ width: '180px', height: '180px', background: 'hsla(220, 10%, 15%, 0.4)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <RefreshCw className="animate-spin" size={24} />
+                  </div>
+                )}
+                
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  Scan QR with iPhone/iPad camera or enter local address in mobile browser:
+                </p>
 
-              {/* IP Addresses Dropdown & Copy Box */}
-              <div className="ip-list">
-                {serverIps.length > 1 ? (
-                  <select
-                    value={selectedIp}
-                    onChange={(e) => setSelectedIp(e.target.value)}
-                    style={{
-                      backgroundColor: 'hsla(220, 10%, 8%, 0.8)',
-                      border: '1px solid var(--panel-border)',
-                      borderRadius: '8px',
-                      padding: '0.5rem',
-                      color: 'var(--text-main)',
-                      fontSize: '0.85rem',
-                      outline: 'none',
-                      width: '100%',
-                      cursor: 'pointer'
-                    }}
-                    id="ip-selection-dropdown"
-                  >
-                    {serverIps.map((ip) => (
-                      <option key={ip.address} value={ip.address}>
-                        {ip.address} ({ip.interface})
-                      </option>
-                    ))}
-                  </select>
-                ) : null}
+                {/* IP Addresses Dropdown & Copy Box */}
+                <div className="ip-list">
+                  {serverIps.length > 1 ? (
+                    <select
+                      value={selectedIp}
+                      onChange={(e) => setSelectedIp(e.target.value)}
+                      style={{
+                        backgroundColor: 'hsla(220, 10%, 8%, 0.8)',
+                        border: '1px solid var(--panel-border)',
+                        borderRadius: '8px',
+                        padding: '0.5rem',
+                        color: 'var(--text-main)',
+                        fontSize: '0.85rem',
+                        outline: 'none',
+                        width: '100%',
+                        cursor: 'pointer'
+                      }}
+                      id="ip-selection-dropdown"
+                    >
+                      {serverIps.map((ip) => (
+                        <option key={ip.address} value={ip.address}>
+                          {ip.address} ({ip.interface})
+                        </option>
+                      ))}
+                    </select>
+                  ) : null}
 
-                <div className="ip-card">
-                  <span className="ip-address">
-                    http://{selectedIp}:{window.location.port || '3000'}
-                  </span>
-                  <button onClick={copyUrlToClipboard} className="copy-btn" title="Copy Address Link" id="copy-address-btn">
-                    <Copy size={14} />
-                  </button>
-                </div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '0.5rem', width: '100%' }}>
-                  {canManageToken ? (
-                    isEditingToken ? (
+                  <div className="ip-card">
+                    <span className="ip-address">
+                      http://{selectedIp}:{window.location.port || '3000'}
+                    </span>
+                    <button onClick={copyUrlToClipboard} className="copy-btn" title="Copy Address Link" id="copy-address-btn">
+                      <Copy size={14} />
+                    </button>
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '0.5rem', width: '100%' }}>
+                    {isEditingToken ? (
                       <div style={{ display: 'flex', gap: '0.4rem', width: '100%', marginTop: '0.25rem' }}>
                         <input
                           type="text"
@@ -1040,16 +1040,12 @@ export default function App() {
                           Change PIN
                         </button>
                       </div>
-                    )
-                  ) : (
-                    <div>
-                      Access PIN: <strong style={{ color: 'var(--danger)', fontFamily: 'monospace' }}>{token}</strong>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Real-time Shared Clipboard */}
           <div className={`glass-panel ${activeTab !== 'clipboard' ? 'desktop-only' : ''}`}>
