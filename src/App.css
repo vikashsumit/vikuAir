@@ -169,7 +169,7 @@ body {
 /* Dashboard Layout Grid */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1fr 350px;
+  grid-template-columns: minmax(0, 1fr) 350px;
   gap: 1.5rem;
   align-items: start;
 }
@@ -187,7 +187,7 @@ body {
 
 @media (max-width: 900px) {
   .dashboard-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .desktop-only {
     display: none !important;
@@ -441,6 +441,7 @@ body {
 }
 
 .transfer-name {
+  display: block;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -503,6 +504,8 @@ body {
   align-items: center;
   transition: all var(--transition-fast);
   animation: slideIn 0.3s ease-out;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .file-row-card:hover {
