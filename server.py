@@ -30,6 +30,16 @@ if not os.path.exists(UPLOAD_DIR):
 # Helper to scan network interfaces and list local IPs
 def get_local_ips():
     ips = []
+    # Add local mDNS hostname first for easiest cross-device connection
+    try:
+        hostname = socket.gethostname().lower()
+        ips.append({
+            "interface": "Hostname",
+            "address": f"{hostname}.local"
+        })
+    except Exception:
+        pass
+
     try:
         for interface_name, addrs in psutil.net_if_addrs().items():
             for addr in addrs:
@@ -38,6 +48,14 @@ def get_local_ips():
                         "interface": interface_name,
                         "address": addr.address
                     })
+                elif addr.family == socket.AF_INET6:
+                    # Ignore loopback, link-local (fe80::), and multicast/special addresses
+                    ip_str = addr.address.split('%')[0]  # Strip zone index if present
+                    if not ip_str.startswith("::1") and not ip_str.lower().startswith("fe80"):
+                        ips.append({
+                            "interface": interface_name,
+                            "address": f"[{ip_str}]"
+                        })
     except Exception as e:
         print(f"Error reading network interfaces: {e}")
     return ips
@@ -52,10 +70,6 @@ async def lifespan(app_instance: FastAPI):
     print(f"------------------------------------------------------")
     print(f"Local Access (No PIN required):")
     print(f"  🔗 http://localhost:{PORT}")
-    
-    hostname = socket.gethostname().lower()
-    print(f"\nLocal Hostname Link (Easiest for iPad/iPhone):")
-    print(f"  🔗 http://{hostname}.local:{PORT}/?token={ACCESS_TOKEN}")
     
     ips = get_local_ips()
     if ips:
@@ -83,7 +97,7 @@ def is_server_self(remote_ip: str) -> bool:
     if remote_ip in ["127.0.0.1", "::1", "localhost", "::ffff:127.0.0.1"]:
         return True
     
-    local_ips = [ip["address"] for ip in get_local_ips()]
+    local_ips = [ip["address"].strip("[]") for ip in get_local_ips()]
     clean_ip = remote_ip
     if remote_ip.startswith("::ffff:"):
         clean_ip = remote_ip[7:]
