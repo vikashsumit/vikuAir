@@ -269,12 +269,11 @@ async def update_token(request: Request):
             evict_ws.append(ws)
 
     for ws in evict_ws:
-        if ws.client_state.value == 1: # check if open
-            try:
-                await ws.send_text(json.dumps({"type": "auth_revoked"}))
-                await ws.close()
-            except Exception:
-                pass
+        try:
+            await ws.send_text(json.dumps({"type": "auth_revoked"}))
+            await ws.close()
+        except Exception:
+            pass
         if ws in connected_devices:
             del connected_devices[ws]
 
